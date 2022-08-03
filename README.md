@@ -9,6 +9,15 @@ widely known so that others can start modding too. :)
 <br> <br>
 **We still have much more to share, but we are trying to get this out as fast as possible, expect much more documentation incoming. And things to become easier.**
 
+## Installation Instructions:
+1. Install [Blender](https://www.blender.org/) (also available on Steam).
+2. Download this repository as a ZIP (Green button labelled "Code" near the top-right, `Download ZIP`).
+3. Launch Blender.
+4. Go to `Edit > Preferences`.
+5. Go to the `Add-ons` section and press `Install...` near the top-right.
+6. Select the ZIP you downloaded in step 2 and press `Install Add-on`.
+7. Check the tickbox next to `Import-Export: Nier2Blender2NieR (NieR:Automata Data Exporter)`.
+
 ## Some Tips:
 #### For now, you should just understand these basic things:
 * ~~You can find info/tutorials at the wiki (near top of this page) [SORTA OUTDATED]~~.
@@ -22,13 +31,13 @@ widely known so that others can start modding too. :)
 * A lot of my code is put together with duct-tape and instant ramen, thus it is unoptimized, ugly and straight up fucked at places. :)
 
 ## WTP & WTA Setup (Textures/Shaders)
-* The WTP/WTA Exporter can be found under the "Output" tab of the "Properties" window.
+* The WTP/WTA Exporter can be found under the "Output" tab of the "Properties" window (the "printer" icon).
 * (This is one automatically assuming your file structure is fine). I recommend loading the original textures before adding/replacing with custom ones. To do this, use the "Select Textures Directory" option and load the "textures" folder created when importing a model (*/nier2blender_extracted/######.dtt/textures/*)
 * After adding or changing a unique texture identifier, make sure to "Sync Identifiers in Materials" before exporting a WMB.
 * Leave texture paths set to "None" if the map is unused.
 
 ## Exporting For NieR:Automata
-* The full exporter can be found under the "Output" tab of the "Properties" window.
+* The full exporter can be found under the "Output" tab of the "Properties" window (the "printer" icon).
 * Make sure you have the required metadata files also located in the folder you wish to pack (metadata files are generated when importing a DAT/DTT and can be found the nier2blender_extracted directories).
 * The One-Click Exporter is highly recommended to save you time!
 * WMB & WTP is packed in the DTT. Other files (like the WTA) is packed in the DAT.
