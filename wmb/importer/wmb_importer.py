@@ -27,7 +27,7 @@ def reset_blend():
 		bpy.data.objects.remove(obj)
 		obj.user_clear()
 
-def construct_armature(name, bone_data_array, firstLevel, secondLevel, thirdLevel, boneMap, boneSetArray, collection_name):			# bone_data =[boneIndex, boneName, parentIndex, parentName, bone_pos, optional, boneNumber, localPos, local_rotation, world_rotation, world_position_tpose]
+def construct_armature(name, bone_data_array, translateTable, firstLevel, secondLevel, thirdLevel, boneMap, boneSetArray, collection_name):			# bone_data =[boneIndex, boneName, parentIndex, parentName, bone_pos, optional, boneNumber, localPos, local_rotation, world_rotation, world_position_tpose]
 	print('[+] importing armature')
 	amt = bpy.data.armatures.new(name +'Amt')
 	ob = bpy.data.objects.new(name, amt)
@@ -41,6 +41,7 @@ def construct_armature(name, bone_data_array, firstLevel, secondLevel, thirdLeve
 	bpy.context.view_layer.objects.active = ob
 	bpy.ops.object.mode_set(mode='EDIT')
 	 
+	amt['translateTable'] = translateTable
 	amt['firstLevel'] = firstLevel
 	amt['secondLevel'] = secondLevel
 	amt['thirdLevel'] = thirdLevel
@@ -684,7 +685,7 @@ def main(only_extract = False, wmb_file = os.path.split(os.path.realpath(__file_
 		armature_no_wmb = wmbname.replace('.wmb','')
 		armature_name_split = armature_no_wmb.split('/')
 		armature_name = armature_name_split[len(armature_name_split)-1] # THIS IS SPAGHETT I KNOW. I WAS TIRED
-		construct_armature(armature_name, boneArray, wmb.firstLevel, wmb.secondLevel, wmb.thirdLevel, wmb.boneMap, wmb.boneSetArray, collection_name)
+		construct_armature(armature_name, boneArray, wmb.translateTable, wmb.firstLevel, wmb.secondLevel, wmb.thirdLevel, wmb.boneMap, wmb.boneSetArray, collection_name)
 	meshes, uvs, usedVerticeIndexArrays = format_wmb_mesh(wmb, collection_name)
 	wmb_materials = get_wmb_material(wmb, texture_dir)
 	materials = []

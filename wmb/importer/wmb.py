@@ -3,7 +3,7 @@ import json
 from time import time
 
 from ...utils.util import print_class, create_dir
-from ...utils.ioUtils import SmartIO, read_uint8_x4, to_string, read_float, read_float16, read_uint16, read_uint8, read_uint64
+from ...utils.ioUtils import SmartIO, read_uint8_x4, to_string, read_float, read_float16, read_int16, read_uint16, read_uint8, read_uint64
 from ...wta_wtp.importer.wta import *
 
 
@@ -585,6 +585,7 @@ class WMB3(object):
 			self.boneArray.append(wmb3_bone(wmb_fp,boneIndex))
 		
 		# indexBoneTranslateTable
+		self.translateTable = []
 		self.firstLevel = []
 		self.secondLevel = []
 		self.thirdLevel = []
@@ -617,9 +618,8 @@ class WMB3(object):
 
 
 			wmb_fp.seek(self.wmb3_header.offsetBoneIndexTranslateTable)
-			unknownData1Array = []
-			for i in range(self.wmb3_header.boneIndexTranslateTableSize):
-				unknownData1Array.append(read_uint8(wmb_fp))
+			for i in range(self.wmb3_header.boneIndexTranslateTableSize/2):
+				self.translateTable.append(read_int16(wmb_fp))
 
 		self.materialArray = []
 		for materialIndex in range(self.wmb3_header.materialCount):

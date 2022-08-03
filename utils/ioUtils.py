@@ -24,6 +24,10 @@ def read_uint16(file) -> int:
     entry = file.read(2)
     return struct.unpack('<H', entry)[0]
 
+def read_uint16_be(file) -> int:
+	entry = file.read(2)
+	return struct.unpack('>H', entry)[0]
+
 def read_int32(file) -> int:
     entry = file.read(4)
     return struct.unpack('<i', entry)[0]
@@ -47,6 +51,32 @@ def read_float16(file) -> float:
 def read_float(file) -> float:
     entry = file.read(4)
     return struct.unpack('<f', entry)[0]
+
+# https://github.com/Kerilk/noesis_bayonetta_pc/blob/master/bayonetta_pc/FloatDecompressor.h    FloatDecompressor(6,9,47)
+def read_pghalf(file) -> float:
+    entry = file.read(2)
+    ui = struct.unpack('<H', entry)[0]
+
+    sign = ui & 0x8000
+    ui ^= sign
+    exponent = ui & 0x7E00
+    significand = ui ^ exponent
+    significand <<= 14
+
+    magic = 1.0
+    si = sign | significand
+    if exponent == 0x7E00:
+        si |= 0x7F800000
+    elif exponent != 0:
+        exponent >>= 9
+        exponent += 0x7FFFFFD1
+        exponent <<= 23
+        si |= exponent
+    elif significand != 0:
+        magic = struct.unpack("<f", struct.pack("<I", 0x50000000))[0]
+    f = struct.unpack("<f", struct.pack("<I", si))[0]
+    f *= magic
+    return f
 
 class SmartIO:
     int8 = "b"
