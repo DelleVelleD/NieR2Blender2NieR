@@ -618,7 +618,7 @@ class WMB3(object):
 
 
 			wmb_fp.seek(self.wmb3_header.offsetBoneIndexTranslateTable)
-			for i in range(self.wmb3_header.boneIndexTranslateTableSize/2):
+			for i in range(self.wmb3_header.boneIndexTranslateTableSize // 2):
 				self.translateTable.append(read_int16(wmb_fp))
 
 		self.materialArray = []

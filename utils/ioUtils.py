@@ -59,6 +59,7 @@ def read_pghalf(file) -> float:
 
     sign = ui & 0x8000
     ui ^= sign
+    sign <<= 16
     exponent = ui & 0x7E00
     significand = ui ^ exponent
     significand <<= 14
@@ -69,11 +70,11 @@ def read_pghalf(file) -> float:
         si |= 0x7F800000
     elif exponent != 0:
         exponent >>= 9
-        exponent += 0x7FFFFFD1
+        exponent += 80
         exponent <<= 23
         si |= exponent
     elif significand != 0:
-        magic = struct.unpack("<f", struct.pack("<I", 0x50000000))[0]
+        magic = struct.unpack("<f", struct.pack("<I", 0x17800000))[0]
     f = struct.unpack("<f", struct.pack("<I", si))[0]
     f *= magic
     return f
