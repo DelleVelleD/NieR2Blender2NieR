@@ -31,6 +31,7 @@ from .lay.importer.layImportOperator import ImportNierLay
 from .wmb.exporter.wmbExportOperator import ExportNierWmb
 from .wmb.importer.wmbImportOperator import ImportNierWmb
 from .xmlScripting.importer.yaxXmlImportOperator import ImportNierYaxXml
+from .mot.importer.motImportOperator import ImportNierMot
 
 
 class NierObjectMenu(bpy.types.Menu):
@@ -72,6 +73,7 @@ def menu_func_import(self, context):
     self.layout.operator(ImportNierSar.bl_idname, text="Audio Environment File (.sar)", icon_value=yorha_icon.icon_id)
     self.layout.operator(ImportNierGaArea.bl_idname, text="Visual Environment File (GAArea.bxm)", icon_value=yorha_icon.icon_id)
     self.layout.operator(ImportNierYaxXml.bl_idname, text="YAX XML for Nier:Automata (.xml)", icon_value=yorha_icon.icon_id)
+    self.layout.operator(ImportNierMot.bl_idname, text="MOT File for Nier:Automata (.mot)", icon_value=yorha_icon.icon_id)
 
 def menu_func_export(self, context):
     pcoll = preview_collections["main"]
@@ -97,6 +99,7 @@ classes = (
     ImportNierSar,
     ImportNierGaArea,
     ImportNierYaxXml,
+    ImportNierMot,
     ExportNierWmb,
     ExportNierCol,
     ExportNierSar,

@@ -39,6 +39,10 @@
 #   a bias of 47.
 #  -This is not written with endianness or non-Nier:Automata games in mind.
 #  -Rotation values are in radians.
+#
+# TODO:
+# -test an animation that uses scaling value types
+# -
 
 #TODO(delle) remove this before pull request
 #from NieR2Blender2NieR.mot.importer.mot import *
@@ -73,22 +77,22 @@ class MOT(object):
 		self.records_count  = read_uint32(mot_file)
 		self.unknown        = read_uint32(mot_file) # usually 0 or 0x003c0000, maybe two uint16
 		self.name           = read_string(mot_file) # found at most 12 bytes with terminating 0
-		print("MOT:")
-		print("  hash:          ", self.hash)
-		print("  flags:         ", self.flags)
-		print("  frame_count:   ", self.frame_count)
-		print("  records_offset:", self.records_offset)
-		print("  records_count: ", self.records_count)
-		print("  unknown:       ", self.unknown)
-		print("  name:          ", self.name)
+		#print("MOT:")
+		#print("  hash:          ", self.hash)
+		#print("  flags:         ", self.flags)
+		#print("  frame_count:   ", self.frame_count)
+		#print("  records_offset:", self.records_offset)
+		#print("  records_count: ", self.records_count)
+		#print("  unknown:       ", self.unknown)
+		#print("  name:          ", self.name)
 
 		# parse MOT records
 		self.records = []
 		for i in range(self.records_count):
-			print("  Record %d:" % len(self.records))
+			#print("  Record %d:" % len(self.records))
 			mot_file.seek(self.records_offset + 12*i)
 			self.records.append(MOT_Record(mot_file, self))
-			print("    frames:", self.records[-1].frames)
+			#print("    frames:", self.records[-1].frames)
 
 		mot_file.close()
 	#def __init__()
@@ -104,17 +108,17 @@ class MOT_Record(object):
 		#### PARSE HEADER ####
 		######################
 
-		self.bone_index  = read_int16(mot_file)
-		self.value_type  = read_int8(mot_file)  # 0-2 translationXYZ, 3-5 rotationXYZ, 7-9 scalingXYZ (bayoMotItem_t::index)
-		self.record_type = read_int8(mot_file)  # (bayoMotItem_t::flag)
-		self.value_count = read_int16(mot_file) # (bayoMotItem_t::elem_number)
-		self.unknown     = read_int16(mot_file) # always -1
-		print("    offset:     ", self.offset)
-		print("    bone_index: ", self.bone_index)
-		print("    value_type: ", self.value_type)
-		print("    record_type:", self.record_type)
-		print("    value_count:", self.value_count)
-		print("    unknown:    ", self.unknown)
+		self.abs_bone_index  = read_int16(mot_file) # must be converted using bone index translate table
+		self.value_type      = read_int8(mot_file)  # 0-2 translationXYZ, 3-5 rotationXYZ, 7-9 scalingXYZ (bayoMotItem_t::index)
+		self.record_type     = read_int8(mot_file)  # (bayoMotItem_t::flag)
+		self.value_count     = read_int16(mot_file) # (bayoMotItem_t::elem_number)
+		self.unknown         = read_int16(mot_file) # always -1
+		#print("    offset:     ", self.offset)
+		#print("    bone_index: ", self.bone_index)
+		#print("    value_type: ", self.value_type)
+		#print("    record_type:", self.record_type)
+		#print("    value_count:", self.value_count)
+		#print("    unknown:    ", self.unknown)
 
 		# only found on terminator (bone index 0x7fff)
 		if self.record_type == -1:
@@ -125,7 +129,7 @@ class MOT_Record(object):
 		if self.record_type == 0:
 			# parse file
 			self.p = read_float(mot_file)
-			print("      p:", self.offset)
+			#print("      p:", self.offset)
 			
 			# generate frames
 			for frame_index in range(mot.frame_count):
@@ -147,11 +151,11 @@ class MOT_Record(object):
 			# parse file
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].p      = read_float(mot_file) # value
-				print("        p:", self.values[-1].p)
+				#print("        p:", self.values[-1].p)
 			
 			# generate frames
 			for frame_index in range(mot.frame_count):
@@ -168,15 +172,15 @@ class MOT_Record(object):
 			# parse file
 			self.p      = read_float(mot_file) # value
 			self.dp     = read_float(mot_file) # value delta
-			print("      p: ", self.p)
-			print("      dp:", self.dp)
+			#print("      p: ", self.p)
+			#print("      dp:", self.dp)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value%d:" % len(self.values))
+				#print("      value%d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].cp     = read_uint16(mot_file) # value quantum
-				print("        cp:", self.values[-1].cp)
+				#print("        cp:", self.values[-1].cp)
 			
 			# generate frames
 			for frame_index in range(mot.frame_count):
@@ -192,15 +196,15 @@ class MOT_Record(object):
 			# parse file
 			self.p      = read_pghalf(mot_file) #value
 			self.dp     = read_pghalf(mot_file) #value delta
-			print("      p:  ", self.p)
-			print("      dp: ", self.dp)
+			#print("      p:  ", self.p)
+			#print("      dp: ", self.dp)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].cp     = read_uint8(mot_file) # value quantum
-				print("        cp:", self.values[-1].cp)
+				#print("        cp:", self.values[-1].cp)
 			
 			# generate frames
 			for frame_index in range(mot.frame_count):
@@ -220,7 +224,7 @@ class MOT_Record(object):
 			# parse file
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].index  = read_uint16(mot_file) # absolute frame index
@@ -228,12 +232,12 @@ class MOT_Record(object):
 				self.values[-1].p      = read_float(mot_file)  # value
 				self.values[-1].m0     = read_float(mot_file)  # incoming derivative
 				self.values[-1].m1     = read_float(mot_file)  # outgoing derivative
-				print("        offset:", self.values[-1].offset)
-				print("        index: ", self.values[-1].index)
-				print("        dummy: ", self.values[-1].dummy)
-				print("        p:     ", self.values[-1].p)
-				print("        m0:    ", self.values[-1].m0)
-				print("        m1:    ", self.values[-1].m1)
+				#print("        offset:", self.values[-1].offset)
+				#print("        index: ", self.values[-1].index)
+				#print("        dummy: ", self.values[-1].dummy)
+				#print("        p:     ", self.values[-1].p)
+				#print("        m0:    ", self.values[-1].m0)
+				#print("        m1:    ", self.values[-1].m1)
 			
 			# generate frames
 			frame_index = 0
@@ -270,26 +274,26 @@ class MOT_Record(object):
 			self.dm0    = read_float(mot_file) # incoming derivative value delta
 			self.m1     = read_float(mot_file) # outgoing derivative value
 			self.dm1    = read_float(mot_file) # outgoing derivative value delta
-			print("      p:  ", self.p)
-			print("      dp: ", self.dp)
-			print("      m0: ", self.m0)
-			print("      dm0:", self.dm0)
-			print("      m1: ", self.m1)
-			print("      dm1:", self.dm1)
+			#print("      p:  ", self.p)
+			#print("      dp: ", self.dp)
+			#print("      m0: ", self.m0)
+			#print("      dm0:", self.dm0)
+			#print("      m1: ", self.m1)
+			#print("      dm1:", self.dm1)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].index  = read_uint16(mot_file) # ABSOLUTE frame index
 				self.values[-1].cp     = read_uint16(mot_file) # value quantum
 				self.values[-1].cm0    = read_uint16(mot_file) # incoming derivative quantum
 				self.values[-1].cm1    = read_uint16(mot_file) # outgoing derivative quantum
-				print("        offset:", self.values[-1].offset)
-				print("        index: ", self.values[-1].index)
-				print("        cp:    ", self.values[-1].cp)
-				print("        cm0:   ", self.values[-1].cm0)
-				print("        cm1:   ", self.values[-1].cm1)
+				#print("        offset:", self.values[-1].offset)
+				#print("        index: ", self.values[-1].index)
+				#print("        cp:    ", self.values[-1].cp)
+				#print("        cm0:   ", self.values[-1].cm0)
+				#print("        cm1:   ", self.values[-1].cm1)
 			
 			# generate frames
 			frame_index = 0
@@ -323,26 +327,26 @@ class MOT_Record(object):
 			self.dm0    = read_pghalf(mot_file) # incoming derivative value delta
 			self.m1     = read_pghalf(mot_file) # outgoing derivative value
 			self.dm1    = read_pghalf(mot_file) # outgoing derivative value delta
-			print("      p:  ", self.p)
-			print("      dp: ", self.dp)
-			print("      m0: ", self.m0)
-			print("      dm0:", self.dm0)
-			print("      m1: ", self.m1)
-			print("      dm1:", self.dm1)
+			#print("      p:  ", self.p)
+			#print("      dp: ", self.dp)
+			#print("      m0: ", self.m0)
+			#print("      dm0:", self.dm0)
+			#print("      m1: ", self.m1)
+			#print("      dm1:", self.dm1)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].index  = read_uint8(mot_file) # ABSOLUTE frame index
 				self.values[-1].cp     = read_uint8(mot_file) # value quantum
 				self.values[-1].cm0    = read_uint8(mot_file) # incoming derivative quantum
 				self.values[-1].cm1    = read_uint8(mot_file) # outgoing derivative quantum
-				print("        offset:", self.values[-1].offset)
-				print("        index: ", self.values[-1].index)
-				print("        cp:    ", self.values[-1].cp)
-				print("        cm0:   ", self.values[-1].cm0)
-				print("        cm1:   ", self.values[-1].cm1)
+				#print("        offset:", self.values[-1].offset)
+				#print("        index: ", self.values[-1].index)
+				#print("        cp:    ", self.values[-1].cp)
+				#print("        cm0:   ", self.values[-1].cm0)
+				#print("        cm1:   ", self.values[-1].cm1)
 			
 			# generate frames
 			frame_index = 0
@@ -376,26 +380,26 @@ class MOT_Record(object):
 			self.dm0    = read_pghalf(mot_file) # incoming derivative value delta
 			self.m1     = read_pghalf(mot_file) # outgoing derivative value
 			self.dm1    = read_pghalf(mot_file) # outgoing derivative value delta
-			print("      p:  ", self.p)
-			print("      dp: ", self.dp)
-			print("      m0: ", self.m0)
-			print("      dm0:", self.dm0)
-			print("      m1: ", self.m1)
-			print("      dm1:", self.dm1)
+			#print("      p:  ", self.p)
+			#print("      dp: ", self.dp)
+			#print("      m0: ", self.m0)
+			#print("      dm0:", self.dm0)
+			#print("      m1: ", self.m1)
+			#print("      dm1:", self.dm1)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].index  = read_uint8(mot_file) # RELATIVE frame index
 				self.values[-1].cp     = read_uint8(mot_file) # value quantum
 				self.values[-1].cm0    = read_uint8(mot_file) # incoming derivative quantum
 				self.values[-1].cm1    = read_uint8(mot_file) # outgoing derivative quantum
-				print("        offset:", self.values[-1].offset)
-				print("        index: ", self.values[-1].index)
-				print("        cp:    ", self.values[-1].cp)
-				print("        cm0:   ", self.values[-1].cm0)
-				print("        cm1:   ", self.values[-1].cm1)
+				#print("        offset:", self.values[-1].offset)
+				#print("        index: ", self.values[-1].index)
+				#print("        cp:    ", self.values[-1].cp)
+				#print("        cm0:   ", self.values[-1].cm0)
+				#print("        cm1:   ", self.values[-1].cm1)
 			
 			# generate frames
 			frame_index = 0
@@ -429,26 +433,26 @@ class MOT_Record(object):
 			self.dm0    = read_pghalf(mot_file) # incoming derivative value delta
 			self.m1     = read_pghalf(mot_file) # outgoing derivative value
 			self.dm1    = read_pghalf(mot_file) # outgoing derivative value delta
-			print("      p:  ", self.p)
-			print("      dp: ", self.dp)
-			print("      m0: ", self.m0)
-			print("      dm0:", self.dm0)
-			print("      m1: ", self.m1)
-			print("      dm1:", self.dm1)
+			#print("      p:  ", self.p)
+			#print("      dp: ", self.dp)
+			#print("      m0: ", self.m0)
+			#print("      dm0:", self.dm0)
+			#print("      m1: ", self.m1)
+			#print("      dm1:", self.dm1)
 			self.values = []
 			for i in range(self.value_count):
-				print("      value %d:" % len(self.values))
+				#print("      value %d:" % len(self.values))
 				self.values.append(MOT_Value())
 				self.values[-1].offset = mot_file.tell()
 				self.values[-1].index  = read_uint16_be(mot_file) # ABSOLUTE frame index (big endian order)
 				self.values[-1].cp     = read_uint8(mot_file)     # value quantum
 				self.values[-1].cm0    = read_uint8(mot_file)     # incoming derivative quantum
 				self.values[-1].cm1    = read_uint8(mot_file)     # outgoing derivative quantum
-				print("        offset:", self.values[-1].offset)
-				print("        index: ", self.values[-1].index)
-				print("        cp:    ", self.values[-1].cp)
-				print("        cm0:   ", self.values[-1].cm0)
-				print("        cm1:   ", self.values[-1].cm1)
+				#print("        offset:", self.values[-1].offset)
+				#print("        index: ", self.values[-1].index)
+				#print("        cp:    ", self.values[-1].cp)
+				#print("        cm0:   ", self.values[-1].cm0)
+				#print("        cm1:   ", self.values[-1].cm1)
 			
 			# generate frames
 			frame_index = 0
@@ -477,15 +481,20 @@ class MOT_Record(object):
 	#def __init__()
 
 	# MotionBayo.h::Model_Bayo_DecodeMotionIndex()
-	def absolute_bone_index(self, translate_table, bone_count:int) -> int:
-		if self.bone_index == -1: return bone_count
-		index = translate_table[ (self.bone_index >> 8) & 0xf]
-		if index == -1: return 0x0fff
-		index = translate_table[((self.bone_index >> 4) & 0xf) + index]
-		if index == -1: return 0x0fff
-		index = translate_table[ (self.bone_index       & 0xf) + index]
-		return index
-	#def absolute_bone_index()
+	def bone_index(self, translate_table) -> int:
+		if self.abs_bone_index == -1:
+			#print("[MOT-Info] global bone index -1 translated to bone index 0")
+			return 0
+		index = translate_table[(self.abs_bone_index >> 8) & 0xf]
+		if index != -1:
+			index = translate_table[((self.abs_bone_index >> 4) & 0xf) + index]
+			if index != -1:
+				index = translate_table[(self.abs_bone_index & 0xf) + index]
+				#print("[MOT-Info] global bone index %d translated to bone index %d" % (self.abs_bone_index, index))
+				return index
+		print("[MOT-Error] Unable to translate bone for the record at offset 0x%s." % hex(self.offset))
+		return 0x0fff
+	#def bone_index()
 #class MOT_Record
 
 class MOT_Value(object):
